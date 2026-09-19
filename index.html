@@ -2,399 +2,1211 @@
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kairos AI Assistant</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+
+<title>KAIROS 3D — AI Command Center</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#03050b;
+  --panel:rgba(10,15,28,.68);
+  --line:rgba(130,150,255,.18);
+  --cyan:#00eaff;
+  --violet:#8b5cff;
+  --blue:#3d7cff;
+  --text:#f5f7ff;
+  --muted:#8994ae;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
 body{
-  font-family:Arial,sans-serif;
-  background:#080b14;
-  color:#fff;
   min-height:100vh;
-}
-.app{max-width:1100px;margin:auto;padding:18px}
-.header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:15px 5px 22px;
-}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-icon{
-  width:48px;height:48px;border-radius:15px;
-  display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,#7c5cff,#00d4ff);
-  font-size:25px;
-}
-.logo h1{font-size:25px}
-.logo small{display:block;color:#8e96aa;margin-top:3px}
-
-.status{
-  background:#101827;border:1px solid #263149;
-  padding:8px 12px;border-radius:20px;
-  font-size:12px;color:#70e1a1;
+  overflow-x:hidden;
+  background:
+    radial-gradient(circle at 50% 25%,#101e48 0%,#070b18 28%,#03050b 70%);
+  color:var(--text);
+  font-family:Inter,Arial,sans-serif;
 }
 
-.hero{
-  background:linear-gradient(135deg,#15152b,#101b2d);
-  border:1px solid #27314b;
-  border-radius:25px;padding:25px;margin-bottom:18px;
-}
-.hero h2{font-size:27px;margin-bottom:8px}
-.hero p{color:#a9b1c3;line-height:1.5}
+/* ---------- SPACE ---------- */
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;margin-bottom:18px;
-}
-.card{
-  background:#101522;
-  border:1px solid #242e45;
-  border-radius:18px;padding:18px;
-  cursor:pointer;transition:.2s;
-}
-.card:hover{border-color:#695cff;transform:translateY(-2px)}
-.card .icon{font-size:27px;margin-bottom:10px}
-.card h3{font-size:16px;margin-bottom:5px}
-.card p{font-size:12px;color:#8993a8}
-
-.section{
-  background:#101522;
-  border:1px solid #242e45;
-  border-radius:20px;padding:18px;margin-bottom:18px;
-}
-.section-title{
-  font-size:18px;margin-bottom:14px;
+.space{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:0;
 }
 
-.video-count{
-  display:flex;gap:10px;
-}
-.video-count button{
-  flex:1;border:1px solid #303b55;
-  background:#151c2c;color:white;
-  padding:13px;border-radius:12px;
-  cursor:pointer;font-size:15px;
-}
-.video-count button.active{
-  background:#6c5cff;border-color:#8b7dff;
+.star{
+  position:absolute;
+  width:2px;
+  height:2px;
+  border-radius:50%;
+  background:white;
+  opacity:.5;
+  animation:blink 3s infinite alternate;
 }
 
-.chat{
-  height:260px;
-  overflow-y:auto;
-  background:#090d17;
-  border-radius:15px;
-  padding:14px;margin-bottom:12px;
-}
-.msg{
-  padding:11px 13px;
-  border-radius:13px;
-  margin-bottom:10px;
-  max-width:90%;
-  line-height:1.45;
-  font-size:14px;
-}
-.ai{background:#182238}
-.user{
-  background:#5e50d8;
-  margin-left:auto;
-}
-.chat-input{
-  display:flex;gap:8px;
-}
-.chat-input input{
-  flex:1;
-  background:#171e2d;
-  border:1px solid #303a50;
-  color:white;
-  padding:14px;
-  border-radius:13px;
-  outline:none;
-}
-button{
-  border:0;
-  color:white;
-  background:#6c5cff;
-  padding:13px 16px;
-  border-radius:13px;
-  cursor:pointer;
-  font-weight:bold;
-}
-.voice{
-  background:#1c2638;
-  min-width:50px;
+@keyframes blink{
+  from{opacity:.15}
+  to{opacity:.9}
 }
 
-.start{
-  width:100%;
-  padding:17px;
-  font-size:17px;
-  background:linear-gradient(90deg,#6c5cff,#00aeea);
-  margin-top:5px;
+/* ---------- BACKGROUND GRID ---------- */
+
+.grid-bg{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:.18;
+  background-image:
+    linear-gradient(rgba(70,100,180,.15) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(70,100,180,.15) 1px,transparent 1px);
+  background-size:55px 55px;
+  transform:perspective(500px) rotateX(65deg) scale(2);
+  transform-origin:center bottom;
+  mask-image:linear-gradient(to top,black,transparent 75%);
 }
 
-.activity{
-  display:flex;align-items:center;
-  gap:10px;padding:12px 0;
-  border-bottom:1px solid #202a3d;
-  color:#aeb6c7;font-size:14px;
-}
-.activity:last-child{border-bottom:0}
-.dot{
-  width:9px;height:9px;border-radius:50%;
-  background:#606b80;
-}
-.dot.green{background:#55df91}
+/* ---------- APP ---------- */
 
-.footer{
-  text-align:center;
-  color:#626d82;font-size:12px;
+.app{
+  position:relative;
+  z-index:2;
+  width:min(1200px,100%);
+  margin:auto;
   padding:20px;
 }
 
-@media(max-width:600px){
-  .app{padding:12px}
-  .grid{grid-template-columns:1fr 1fr}
-  .hero h2{font-size:22px}
-  .status{font-size:10px}
+/* ---------- HEADER ---------- */
+
+.header{
+  height:72px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.logo{
+  width:52px;
+  height:52px;
+  border-radius:17px;
+  display:grid;
+  place-items:center;
+  font-size:26px;
+  background:
+    linear-gradient(145deg,#8b5cff,#00d9ff);
+  box-shadow:
+    0 0 20px #735cff66,
+    inset 0 0 20px #ffffff33;
+  transform-style:preserve-3d;
+  transition:.15s;
+}
+
+.brand-title{
+  font-size:24px;
+  font-weight:800;
+  letter-spacing:4px;
+}
+
+.brand-sub{
+  margin-top:4px;
+  font-size:9px;
+  color:var(--muted);
+  letter-spacing:2.5px;
+}
+
+.online{
+  padding:9px 13px;
+  border-radius:30px;
+  border:1px solid rgba(80,255,170,.25);
+  background:rgba(10,30,24,.5);
+  color:#63ffad;
+  font-size:10px;
+  letter-spacing:1px;
+  box-shadow:0 0 20px rgba(70,255,160,.08);
+}
+
+/* ---------- HERO ---------- */
+
+.hero{
+  min-height:570px;
+  position:relative;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  perspective:1200px;
+  overflow:visible;
+}
+
+/* ---------- 3D CORE ---------- */
+
+.core-wrap{
+  position:relative;
+  width:300px;
+  height:300px;
+  transform-style:preserve-3d;
+  transition:transform .08s linear;
+}
+
+.core-glow{
+  position:absolute;
+  inset:-100px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle,
+      rgba(0,234,255,.18),
+      rgba(139,92,255,.08) 40%,
+      transparent 70%);
+  filter:blur(20px);
+}
+
+.core{
+  position:absolute;
+  inset:35px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  transform-style:preserve-3d;
+
+  background:
+    radial-gradient(circle at 35% 25%,
+      #536cff,
+      #16235d 30%,
+      #080e25 65%,
+      #02040d);
+
+  border:1px solid rgba(120,180,255,.55);
+
+  box-shadow:
+    0 0 35px rgba(0,234,255,.45),
+    0 0 100px rgba(139,92,255,.25),
+    inset 0 0 45px rgba(0,234,255,.2);
+}
+
+.core::before{
+  content:"";
+  position:absolute;
+  inset:-15px;
+  border-radius:50%;
+  border:1px solid rgba(0,234,255,.5);
+  border-left-color:transparent;
+  border-right-color:#8b5cff;
+  animation:spin 8s linear infinite;
+}
+
+.core::after{
+  content:"";
+  position:absolute;
+  inset:-32px;
+  border-radius:50%;
+  border:1px dashed rgba(130,150,255,.3);
+  animation:spinReverse 13s linear infinite;
+}
+
+@keyframes spin{
+  to{transform:rotateZ(360deg)}
+}
+
+@keyframes spinReverse{
+  to{transform:rotateZ(-360deg)}
+}
+
+.core-center{
+  position:relative;
+  z-index:5;
+  text-align:center;
+  transform:translateZ(45px);
+}
+
+.robot{
+  font-size:55px;
+  filter:drop-shadow(0 0 18px #00eaff);
+  animation:float 3s ease-in-out infinite;
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+
+.core-name{
+  margin-top:5px;
+  font-size:12px;
+  font-weight:bold;
+  letter-spacing:5px;
+  color:#a7f7ff;
+}
+
+.core-status{
+  margin-top:7px;
+  font-size:8px;
+  letter-spacing:2px;
+  color:#6dffb0;
+}
+
+/* ---------- ORBIT RINGS ---------- */
+
+.orbit{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  border:1px solid rgba(0,234,255,.13);
+  transform-style:preserve-3d;
+  pointer-events:none;
+}
+
+.o1{
+  transform:rotateX(65deg);
+}
+
+.o2{
+  transform:rotateY(65deg);
+}
+
+.o3{
+  transform:rotateX(35deg) rotateY(35deg);
+}
+
+/* ---------- FLOATING MODULES ---------- */
+
+.module{
+  position:absolute;
+  width:175px;
+  min-height:112px;
+  padding:17px;
+  border-radius:20px;
+
+  background:
+    linear-gradient(145deg,
+      rgba(22,30,55,.82),
+      rgba(5,9,20,.65));
+
+  border:1px solid var(--line);
+
+  backdrop-filter:blur(16px);
+
+  box-shadow:
+    0 18px 50px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.06);
+
+  transform-style:preserve-3d;
+
+  transition:
+    transform .15s ease,
+    border-color .2s,
+    box-shadow .2s;
+
+  cursor:pointer;
+}
+
+.module:hover{
+  border-color:rgba(0,234,255,.5);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.5),
+    0 0 30px rgba(0,234,255,.12);
+}
+
+.module-icon{
+  font-size:27px;
+  margin-bottom:9px;
+  transform:translateZ(25px);
+}
+
+.module h3{
+  font-size:13px;
+  letter-spacing:1.5px;
+  transform:translateZ(20px);
+}
+
+.module p{
+  margin-top:6px;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.4;
+}
+
+.m1{
+  left:2%;
+  top:18%;
+}
+
+.m2{
+  right:2%;
+  top:18%;
+}
+
+.m3{
+  left:4%;
+  bottom:12%;
+}
+
+.m4{
+  right:4%;
+  bottom:12%;
+}
+
+/* ---------- COMMAND PANEL ---------- */
+
+.command{
+  position:relative;
+  margin-top:0;
+  padding:20px;
+  border-radius:25px;
+
+  background:
+    linear-gradient(145deg,
+      rgba(14,20,37,.82),
+      rgba(4,7,15,.72));
+
+  border:1px solid var(--line);
+
+  backdrop-filter:blur(20px);
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+.command-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+.command-title{
+  font-size:13px;
+  letter-spacing:2px;
+}
+
+.command-live{
+  font-size:9px;
+  color:#64ffae;
+}
+
+.chat{
+  height:190px;
+  overflow:auto;
+  padding:10px;
+  border-radius:17px;
+  background:rgba(2,5,12,.7);
+  border:1px solid rgba(100,120,180,.1);
+}
+
+.msg{
+  width:max-content;
+  max-width:90%;
+  padding:10px 13px;
+  border-radius:13px;
+  margin-bottom:9px;
+  font-size:12px;
+  line-height:1.45;
+}
+
+.ai{
+  background:#131d34;
+  border:1px solid rgba(100,130,220,.12);
+}
+
+.user{
+  margin-left:auto;
+  background:linear-gradient(135deg,#604bd4,#3f74e9);
+}
+
+.input-row{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.input-row input{
+  flex:1;
+  min-width:0;
+  border:1px solid #293550;
+  outline:none;
+  border-radius:14px;
+  padding:14px;
+  background:#080d19;
+  color:#fff;
+  font-size:13px;
+}
+
+.btn{
+  border:0;
+  color:white;
+  border-radius:14px;
+  padding:13px 17px;
+  background:linear-gradient(135deg,#7057ef,#009ed7);
+  font-weight:bold;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 25px rgba(0,190,255,.18);
+}
+
+.voice{
+  width:50px;
+  padding:0;
+  font-size:17px;
+}
+
+/* ---------- SYSTEM ---------- */
+
+.system{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:15px;
+}
+
+.sys{
+  padding:14px;
+  border-radius:17px;
+  text-align:center;
+  background:rgba(8,13,25,.7);
+  border:1px solid rgba(100,120,180,.12);
+}
+
+.sys-icon{
+  font-size:19px;
+}
+
+.sys-title{
+  margin-top:6px;
+  font-size:10px;
+}
+
+.sys-status{
+  margin-top:4px;
+  color:#61f5a4;
+  font-size:8px;
+  letter-spacing:1px;
+}
+
+/* ---------- MOTION BUTTON ---------- */
+
+.motion-btn{
+  position:fixed;
+  right:16px;
+  bottom:16px;
+  z-index:20;
+  border:1px solid rgba(0,234,255,.35);
+  background:rgba(8,15,30,.85);
+  color:#b9faff;
+  padding:11px 13px;
+  border-radius:14px;
+  backdrop-filter:blur(12px);
+  font-size:10px;
+  cursor:pointer;
+}
+
+/* ---------- TOAST ---------- */
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:25px;
+  transform:translate(-50%,30px);
+  opacity:0;
+  z-index:50;
+  padding:12px 17px;
+  border-radius:14px;
+  background:#10192b;
+  border:1px solid #354463;
+  color:#dce8ff;
+  font-size:11px;
+  transition:.3s;
+  pointer-events:none;
+}
+
+.toast.show{
+  transform:translate(-50%,0);
+  opacity:1;
+}
+
+/* ---------- MOBILE ---------- */
+
+@media(max-width:720px){
+
+  .app{
+    padding:13px;
+  }
+
+  .header{
+    height:65px;
+  }
+
+  .brand-title{
+    font-size:19px;
+    letter-spacing:3px;
+  }
+
+  .brand-sub{
+    font-size:7px;
+  }
+
+  .logo{
+    width:45px;
+    height:45px;
+    border-radius:14px;
+  }
+
+  .online{
+    font-size:8px;
+    padding:8px 10px;
+  }
+
+  .hero{
+    min-height:550px;
+  }
+
+  .core-wrap{
+    width:235px;
+    height:235px;
+  }
+
+  .core{
+    inset:30px;
+  }
+
+  .module{
+    width:130px;
+    min-height:95px;
+    padding:12px;
+    border-radius:17px;
+  }
+
+  .module-icon{
+    font-size:21px;
+  }
+
+  .module h3{
+    font-size:10px;
+  }
+
+  .module p{
+    font-size:8px;
+  }
+
+  .m1{
+    left:0;
+    top:5%;
+  }
+
+  .m2{
+    right:0;
+    top:5%;
+  }
+
+  .m3{
+    left:0;
+    bottom:4%;
+  }
+
+  .m4{
+    right:0;
+    bottom:4%;
+  }
+
+  .system{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .motion-btn{
+    bottom:12px;
+    right:12px;
+  }
+}
+
+@media(max-width:420px){
+
+  .hero{
+    min-height:520px;
+  }
+
+  .core-wrap{
+    width:205px;
+    height:205px;
+  }
+
+  .module{
+    width:116px;
+  }
+
+  .module p{
+    display:none;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<div class="space" id="space"></div>
+<div class="grid-bg"></div>
 
-<header class="header">
-  <div class="logo">
-    <div class="logo-icon">🤖</div>
-    <div>
-      <h1>Kairos</h1>
-      <small>Personal AI Assistant</small>
-    </div>
-  </div>
-  <div class="status">● Online</div>
-</header>
+<div class="app" id="app">
 
-<section class="hero">
-  <h2>नमस्ते Sir 👋</h2>
-  <p>
-    मैं Kairos हूँ। आप अपना काम बताइए और मैं उसे
-    research, script, video और publishing workflow में तैयार करने में मदद करूँगा।
-  </p>
-</section>
+  <!-- HEADER -->
 
-<section class="section">
-  <div class="section-title">🚀 आज कितने वीडियो बनाने हैं?</div>
+  <header class="header">
 
-  <div class="video-count">
-    <button onclick="selectVideos(1)" id="v1">1 Video</button>
-    <button onclick="selectVideos(2)" id="v2" class="active">2 Videos</button>
-    <button onclick="selectVideos(3)" id="v3">3 Videos</button>
-  </div>
-</section>
+    <div class="brand">
 
-<div class="grid">
+      <div class="logo" id="logo">
+        ⚡
+      </div>
 
-  <div class="card" onclick="quickAction('Research')">
-    <div class="icon">🔎</div>
-    <h3>Research</h3>
-    <p>Trending topics और current information</p>
-  </div>
+      <div>
+        <div class="brand-title">KAIROS 3D</div>
+        <div class="brand-sub">
+          PERSONAL AI COMMAND CENTER
+        </div>
+      </div>
 
-  <div class="card" onclick="quickAction('Script')">
-    <div class="icon">✍️</div>
-    <h3>Script</h3>
-    <p>Story और video script तैयार करें</p>
-  </div>
-
-  <div class="card" onclick="quickAction('Video')">
-    <div class="icon">🎬</div>
-    <h3>AI Video</h3>
-    <p>Video generation workflow</p>
-  </div>
-
-  <div class="card" onclick="quickAction('YouTube')">
-    <div class="icon">📺</div>
-    <h3>YouTube</h3>
-    <p>Upload और publishing workflow</p>
-  </div>
-
-</div>
-
-<section class="section">
-
-  <div class="section-title">💬 Kairos से बात करें</div>
-
-  <div class="chat" id="chat">
-
-    <div class="msg ai">
-      🤖 Kairos: मैं तैयार हूँ। बताइए आज क्या काम करना है?
     </div>
 
-  </div>
+    <div class="online">
+      ● SYSTEM ONLINE
+    </div>
 
-  <div class="chat-input">
+  </header>
 
-    <button class="voice" onclick="voiceInput()">🎙️</button>
 
-    <input
-      id="message"
-      type="text"
-      placeholder="जैसे: आज 2 Shorts बनाओ..."
-      onkeydown="if(event.key==='Enter')sendMessage()"
-    >
+  <!-- 3D HERO -->
 
-    <button onclick="sendMessage()">Send</button>
+  <section class="hero">
 
-  </div>
+    <div class="core-wrap" id="coreWrap">
 
-</section>
+      <div class="core-glow"></div>
 
-<section class="section">
+      <div class="orbit o1"></div>
+      <div class="orbit o2"></div>
+      <div class="orbit o3"></div>
 
-  <div class="section-title">⚡ Automation</div>
+      <div class="core">
 
-  <button class="start" onclick="startAutomation()">
-    🚀 Start Today's Automation
-  </button>
+        <div class="core-center">
 
-</section>
+          <div class="robot">🤖</div>
 
-<section class="section">
+          <div class="core-name">
+            KAIROS
+          </div>
 
-  <div class="section-title">📊 Activity</div>
+          <div class="core-status">
+            AI CORE READY
+          </div>
 
-  <div class="activity">
-    <span class="dot green"></span>
-    Kairos Dashboard तैयार
-  </div>
+        </div>
 
-  <div class="activity">
-    <span class="dot"></span>
-    AI connection — अगले चरण में
-  </div>
+      </div>
 
-  <div class="activity">
-    <span class="dot"></span>
-    Video generation — अगले चरण में
-  </div>
+    </div>
 
-  <div class="activity">
-    <span class="dot"></span>
-    YouTube automation — अगले चरण में
-  </div>
 
-</section>
+    <!-- MODULES -->
 
-<div class="footer">
-  Kairos AI Assistant • Your Personal Automation System
+    <div class="module m1"
+         onclick="selectModule('RESEARCH')">
+
+      <div class="module-icon">🔎</div>
+
+      <h3>RESEARCH</h3>
+
+      <p>
+        Trending topics, ideas & web intelligence
+      </p>
+
+    </div>
+
+
+    <div class="module m2"
+         onclick="selectModule('SCRIPT')">
+
+      <div class="module-icon">🧠</div>
+
+      <h3>SCRIPT ENGINE</h3>
+
+      <p>
+        Stories, scripts and content generation
+      </p>
+
+    </div>
+
+
+    <div class="module m3"
+         onclick="selectModule('AI VIDEO')">
+
+      <div class="module-icon">🎬</div>
+
+      <h3>AI VIDEO</h3>
+
+      <p>
+        AI video production workflow
+      </p>
+
+    </div>
+
+
+    <div class="module m4"
+         onclick="selectModule('YOUTUBE')">
+
+      <div class="module-icon">▶️</div>
+
+      <h3>YOUTUBE</h3>
+
+      <p>
+        Publishing & automation control
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <!-- COMMAND CENTER -->
+
+  <section class="command">
+
+    <div class="command-head">
+
+      <div class="command-title">
+        ◉ KAIROS COMMAND CONSOLE
+      </div>
+
+      <div class="command-live">
+        ● LIVE
+      </div>
+
+    </div>
+
+
+    <div class="chat" id="chat">
+
+      <div class="msg ai">
+        🤖 नमस्ते Sir! KAIROS 3D online है।
+        Command दीजिए।
+      </div>
+
+    </div>
+
+
+    <div class="input-row">
+
+      <button class="btn voice"
+              onclick="startVoice()">
+        🎙️
+      </button>
+
+      <input
+        id="input"
+        type="text"
+        placeholder="जैसे: आज 2 Shorts बनाओ..."
+        onkeydown="if(event.key==='Enter')sendCommand()"
+      >
+
+      <button class="btn"
+              onclick="sendCommand()">
+        SEND
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- SYSTEM STATUS -->
+
+  <section class="system">
+
+    <div class="sys">
+      <div class="sys-icon">🧠</div>
+      <div class="sys-title">AI CORE</div>
+      <div class="sys-status">READY</div>
+    </div>
+
+    <div class="sys">
+      <div class="sys-icon">🎙️</div>
+      <div class="sys-title">VOICE</div>
+      <div class="sys-status">READY</div>
+    </div>
+
+    <div class="sys">
+      <div class="sys-icon">🎬</div>
+      <div class="sys-title">VIDEO</div>
+      <div class="sys-status">STANDBY</div>
+    </div>
+
+    <div class="sys">
+      <div class="sys-icon">▶️</div>
+      <div class="sys-title">YOUTUBE</div>
+      <div class="sys-status">STANDBY</div>
+    </div>
+
+  </section>
+
 </div>
 
-</div>
+
+<button class="motion-btn"
+        onclick="enableMotion()">
+  📱 Enable Motion
+</button>
+
+<div class="toast" id="toast"></div>
+
 
 <script>
 
-let videoCount = 2;
+/* =========================================
+   STAR FIELD
+========================================= */
 
-function selectVideos(number){
+const space=document.getElementById("space");
 
-  videoCount = number;
+for(let i=0;i<130;i++){
 
-  document.querySelectorAll(".video-count button")
-  .forEach(b => b.classList.remove("active"));
+  const star=document.createElement("div");
 
-  document.getElementById("v"+number)
-  .classList.add("active");
+  star.className="star";
 
-  addAI("ठीक है Sir 👍 आज " + number +
-        " वीडियो के लिए setup रहेगा।");
+  star.style.left=(Math.random()*100)+"%";
+  star.style.top=(Math.random()*100)+"%";
+
+  const size=(Math.random()*2+1);
+
+  star.style.width=size+"px";
+  star.style.height=size+"px";
+
+  star.style.animationDelay=
+    (Math.random()*4)+"s";
+
+  space.appendChild(star);
 }
 
-function addAI(text){
 
-  const chat=document.getElementById("chat");
+/* =========================================
+   DESKTOP MOUSE 3D TRACKING
+========================================= */
 
-  const div=document.createElement("div");
-  div.className="msg ai";
-  div.innerText="🤖 Kairos: "+text;
+const coreWrap=
+  document.getElementById("coreWrap");
 
-  chat.appendChild(div);
-  chat.scrollTop=chat.scrollHeight;
-}
+const logo=
+  document.getElementById("logo");
 
-function addUser(text){
+const modules=
+  document.querySelectorAll(".module");
 
-  const chat=document.getElementById("chat");
+let mouseX=0;
+let mouseY=0;
 
-  const div=document.createElement("div");
-  div.className="msg user";
-  div.innerText="👤 "+text;
+document.addEventListener("mousemove",(event)=>{
 
-  chat.appendChild(div);
-  chat.scrollTop=chat.scrollHeight;
-}
+  mouseX=
+    (event.clientX/window.innerWidth-.5);
 
-function sendMessage(){
+  mouseY=
+    (event.clientY/window.innerHeight-.5);
 
-  const input=document.getElementById("message");
-  const text=input.value.trim();
+  const rotateY=
+    mouseX*18;
 
-  if(!text)return;
+  const rotateX=
+    -mouseY*18;
 
-  addUser(text);
-  input.value="";
+  coreWrap.style.transform=
+    `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
 
-  setTimeout(function(){
+  logo.style.transform=
+    `rotateX(${rotateX*.8}deg) rotateY(${rotateY*.8}deg)`;
 
-    addAI(
-      "आपका आदेश मिल गया। अभी मेरा AI backend connect नहीं है। " +
-      "अगले चरण में मुझे असली AI से connect करेंगे।"
+  modules.forEach((module,index)=>{
+
+    const depth=
+      index%2===0 ? 1 : -1;
+
+    module.style.transform=
+      `translate3d(${mouseX*12*depth}px,
+                   ${mouseY*12*depth}px,
+                   0)
+       rotateX(${rotateX*.25}deg)
+       rotateY(${rotateY*.25}deg)`;
+
+  });
+
+});
+
+
+/* =========================================
+   MOBILE TOUCH PARALLAX
+========================================= */
+
+document.addEventListener("touchmove",(event)=>{
+
+  const touch=event.touches[0];
+
+  if(!touch)return;
+
+  const x=
+    touch.clientX/window.innerWidth-.5;
+
+  const y=
+    touch.clientY/window.innerHeight-.5;
+
+  coreWrap.style.transform=
+    `rotateX(${-y*16}deg)
+     rotateY(${x*16}deg)`;
+
+},{passive:true});
+
+
+/* =========================================
+   DEVICE MOTION
+========================================= */
+
+function enableMotion(){
+
+  if(
+    typeof DeviceOrientationEvent !== "undefined" &&
+    typeof DeviceOrientationEvent.requestPermission === "function"
+  ){
+
+    DeviceOrientationEvent
+      .requestPermission()
+      .then(permission=>{
+
+        if(permission==="granted"){
+
+          window.addEventListener(
+            "deviceorientation",
+            handleOrientation
+          );
+
+          showToast("📱 Motion enabled");
+
+        }else{
+
+          showToast("Motion permission denied");
+
+        }
+
+      })
+      .catch(()=>{
+
+        showToast("Motion permission unavailable");
+
+      });
+
+  }else{
+
+    window.addEventListener(
+      "deviceorientation",
+      handleOrientation
     );
 
-  },500);
-}
-
-function quickAction(action){
-
-  addAI(action+" module चुना गया है। इसे अगले चरण में असली AI service से connect करेंगे।");
-}
-
-function startAutomation(){
-
-  addAI(
-    "🚀 Automation शुरू करने की तैयारी है। " +
-    "आज "+videoCount+" वीडियो चुने गए हैं। " +
-    "अभी backend connect करना बाकी है।"
-  );
-}
-
-function voiceInput(){
-
-  if(!("webkitSpeechRecognition" in window)){
-
-    addAI("इस browser में voice recognition उपलब्ध नहीं है। Chrome में try करें।");
-    return;
+    showToast("📱 Motion enabled");
 
   }
 
-  const recognition=new webkitSpeechRecognition();
+}
+
+
+function handleOrientation(event){
+
+  const beta=
+    Math.max(-25,Math.min(25,event.beta || 0));
+
+  const gamma=
+    Math.max(-25,Math.min(25,event.gamma || 0));
+
+  coreWrap.style.transform=
+    `rotateX(${beta*.45}deg)
+     rotateY(${gamma*.45}deg)`;
+
+}
+
+
+/* =========================================
+   COMMAND CONSOLE
+========================================= */
+
+function sendCommand(){
+
+  const input=
+    document.getElementById("input");
+
+  const text=
+    input.value.trim();
+
+  if(!text)return;
+
+  addMessage(
+    "👤 "+text,
+    "user"
+  );
+
+  input.value="";
+
+  setTimeout(()=>{
+
+    addMessage(
+      "🤖 KAIROS: Command received. " +
+      "अभी AI backend connect नहीं है। " +
+      "यह 3D interface तैयार है; AI connection अगले चरण में जोड़ा जाएगा।",
+      "ai"
+    );
+
+  },450);
+
+}
+
+
+function addMessage(text,type){
+
+  const chat=
+    document.getElementById("chat");
+
+  const message=
+    document.createElement("div");
+
+  message.className=
+    "msg "+type;
+
+  message.innerText=text;
+
+  chat.appendChild(message);
+
+  chat.scrollTop=
+    chat.scrollHeight;
+
+}
+
+
+/* =========================================
+   MODULE SELECTION
+========================================= */
+
+function selectModule(name){
+
+  addMessage(
+    "⚡ "+name+
+    " module selected.",
+    "ai"
+  );
+
+  showToast(
+    name+" module selected"
+  );
+
+}
+
+
+/* =========================================
+   VOICE INPUT
+========================================= */
+
+function startVoice(){
+
+  const SpeechRecognition=
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if(!SpeechRecognition){
+
+    showToast(
+      "Voice recognition इस browser में उपलब्ध नहीं है"
+    );
+
+    return;
+  }
+
+  const recognition=
+    new SpeechRecognition();
 
   recognition.lang="hi-IN";
+
   recognition.interimResults=false;
 
   recognition.start();
 
+  showToast("🎙️ सुन रहा हूँ...");
+
   recognition.onresult=function(event){
 
-    const text=event.results[0][0].transcript;
+    const text=
+      event.results[0][0].transcript;
 
-    document.getElementById("message").value=text;
+    document.getElementById("input").value=text;
+
+  };
+
+  recognition.onerror=function(){
+
+    showToast("Voice input नहीं मिला");
 
   };
 
 }
+
+
+/* =========================================
+   TOAST
+========================================= */
+
+function showToast(text){
+
+  const toast=
+    document.getElementById("toast");
+
+  toast.innerText=text;
+
+  toast.classList.add("show");
+
+  setTimeout(()=>{
+
+    toast.classList.remove("show");
+
+  },2200);
+
+}
+
+
+/* =========================================
+   INITIAL EFFECT
+========================================= */
+
+setTimeout(()=>{
+
+  showToast(
+    "⚡ KAIROS 3D SYSTEM ONLINE"
+  );
+
+},900);
 
 </script>
 
